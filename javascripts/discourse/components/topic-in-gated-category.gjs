@@ -42,29 +42,86 @@ export default class TopicInGatedCategory extends Component {
   }
 
   recalculate() {
-    const gatedByTag = this.tags?.some((t) => this.enabledTags.includes(t));
-    const gatedByCategory = this.enabledCategories.includes(this.categoryId);
+    const pageType = this.pageType; // "topic" | "directory" | "profile"
 
-    if (this.forceShow) {
+    const isAnonymous = !this.currentUser;
+    const isAdmin = this.currentUser?.admin;
+    const isInsider = this.isUserInInsidersGroup();
+
+    const isOwnProfile =
+      pageType === "profile" &&
+      this.profileUser &&
+      this.profileUser.id === this.currentUser?.id;
+
+    // 1. Anonymous → always gated
+    if (isAnonymous) {
       document.body.classList.add("topic-in-gated-category");
       this.set("hidden", false);
       return;
     }
 
-    // Skip gate if neither tag nor category is gated
-    if (!gatedByTag && !gatedByCategory) {
+    // 2. Admin → never gated
+    if (isAdmin) {
+      document.body.classList.remove("topic-in-gated-category");
+      this.set("hidden", true);
       return;
     }
 
-    // Show gate if user not logged in
-    if (!this.currentUser) {
+    // 3. User Profile page logic
+    if (pageType === "profile") {
+      if (isOwnProfile) {
+        // own profile → always allowed
+        document.body.classList.remove("topic-in-gated-category");
+        this.set("hidden", true);
+        return;
+      }
+
+      // viewing someone else's profile
+      if (isInsider) {
+        document.body.classList.remove("topic-in-gated-category");
+        this.set("hidden", true);
+        return;
+      }
+
+      // non-insider → gated
       document.body.classList.add("topic-in-gated-category");
       this.set("hidden", false);
       return;
     }
 
-    // Show gate if logged-in user is not in insiders group
-    if (!this.isUserInInsidersGroup()) {
+    // 4. User Directory page logic
+    if (pageType === "directory") {
+      if (isInsider) {
+        document.body.classList.remove("topic-in-gated-category");
+        this.set("hidden", true);
+        return;
+      }
+
+      // non-insider → gated
+      document.body.classList.add("topic-in-gated-category");
+      this.set("hidden", false);
+      return;
+    }
+
+    // 5. Topic page logic (category/tag based)
+    if (pageType === "topic") {
+      const gatedByTag = this.tags?.some((t) => this.enabledTags.includes(t));
+
+      const gatedByCategory = this.enabledCategories.includes(this.categoryId);
+
+      const topicIsGated = gatedByTag || gatedByCategory;
+
+      if (!topicIsGated) {
+        return; // no gate on this topic
+      }
+
+      if (isInsider) {
+        document.body.classList.remove("topic-in-gated-category");
+        this.set("hidden", true);
+        return;
+      }
+
+      // non-insider → gated
       document.body.classList.add("topic-in-gated-category");
       this.set("hidden", false);
       return;

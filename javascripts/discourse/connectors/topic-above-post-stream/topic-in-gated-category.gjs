@@ -8,6 +8,7 @@ export default class TopicInGatedCategoryConnector extends Component {
     <TopicInGatedCategory
       @categoryId={{this.model.category_id}}
       @tags={{this.model.tags}}
+      @pageType={{"topic"}}
     />
   </template>
 }
