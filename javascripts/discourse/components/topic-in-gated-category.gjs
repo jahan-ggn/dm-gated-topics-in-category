@@ -42,33 +42,67 @@ export default class TopicInGatedCategory extends Component {
   }
 
   recalculate() {
-    const gatedByTag = this.tags?.some((t) => this.enabledTags.includes(t));
-    const gatedByCategory = this.enabledCategories.includes(this.categoryId);
+    const pageType = this.pageType;
 
-    if (this.forceShow) {
+    const isAnonymous = !this.currentUser;
+    const isAdmin = this.currentUser?.admin;
+    const isInsider = this.isUserInInsidersGroup();
+
+    const isOwnProfile =
+      pageType === "profile" &&
+      this.profileUser &&
+      this.profileUser.id === this.currentUser?.id;
+
+    if (isAdmin) {
+      document.body.classList.remove("topic-in-gated-category");
+      this.set("hidden", true);
+      return;
+    }
+
+    if (isInsider) {
+      document.body.classList.remove("topic-in-gated-category");
+      this.set("hidden", true);
+      return;
+    }
+
+    if (pageType === "directory") {
       document.body.classList.add("topic-in-gated-category");
       this.set("hidden", false);
       return;
     }
 
-    // Skip gate if neither tag nor category is gated
-    if (!gatedByTag && !gatedByCategory) {
-      return;
-    }
+    if (pageType === "profile") {
+      if (isOwnProfile) {
+        document.body.classList.remove("topic-in-gated-category");
+        this.set("hidden", true);
+        return;
+      }
 
-    // Show gate if user not logged in
-    if (!this.currentUser) {
       document.body.classList.add("topic-in-gated-category");
       this.set("hidden", false);
       return;
     }
 
-    // Show gate if logged-in user is not in insiders group
-    if (!this.isUserInInsidersGroup()) {
+    if (pageType === "topic") {
+      const gatedByTag = this.tags?.some((t) => this.enabledTags.includes(t));
+
+      const gatedByCategory = this.enabledCategories.includes(this.categoryId);
+
+      const topicIsGated = gatedByTag || gatedByCategory;
+
+      if (!topicIsGated) {
+        document.body.classList.remove("topic-in-gated-category");
+        this.set("hidden", true);
+        return;
+      }
+
       document.body.classList.add("topic-in-gated-category");
       this.set("hidden", false);
       return;
     }
+
+    document.body.classList.remove("topic-in-gated-category");
+    this.set("hidden", true);
   }
 
   @discourseComputed("hidden")
