@@ -7,6 +7,7 @@ export default class GatedUserProfile extends Component {
   }
 
   <template>
+    {{log this.profileUser}}
     <TopicInGatedCategory
       @pageGate={{true}}
       @profileUser={{this.profileUser}}

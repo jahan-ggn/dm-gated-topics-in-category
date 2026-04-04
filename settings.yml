@@ -7,4 +7,9 @@ enabled_tags:
   type: list
   list_type: tag
   default: ""
-  description: "Choose which tags that users need to sign up for. The default is 'gated'."
+  description: "Choose which tags that users need to sign up for."
+enabled_groups:
+  type: list
+  list_type: group
+  default: ""
+  description: "Choose which groups users need to be a member of to view the content. Leave empty to allow all"
