@@ -46,55 +46,6 @@ export default class TopicInGatedCategory extends Component {
     return this.args.pageType;
   }
 
-  // get shouldShow() {
-  //   if (this.userAllowedByGroup) {
-  //     return false;
-  //   }
-
-  //   const isDirectoryPage = this.pageType === "directory";
-  //   const isProfilePage = this.pageType === "profile";
-  //   const isOwnProfile =
-  //     this.pageType === "profile" &&
-  //     this.args.profileUser &&
-  //     this.args.profileUser.id === this.currentUser?.id;
-
-  //   if (isDirectoryPage) {
-  //     return true;
-  //   }
-
-  //   if (isProfilePage) {
-  //     if (isOwnProfile) {
-  //       return false;
-  //     }
-
-  //     return true;
-  //   }
-  //   const hasGroupGating = this.enabledGroups.length > 0;
-  //   const gatedByCategory = this.enabledCategories.includes(
-  //     this.topicCategoryId
-  //   );
-  //   const gatedByTag = this.topicTags.some((tag) =>
-  //     this.enabledTags.includes(typeof tag === "string" ? tag : tag.name)
-  //   );
-
-  //   const hasAnyCategoryOrTag =
-  //     this.enabledCategories.length > 0 || this.enabledTags.length > 0;
-
-  //   if (!hasAnyCategoryOrTag && !hasGroupGating) {
-  //     return false;
-  //   }
-
-  //   if (hasAnyCategoryOrTag && !gatedByCategory && !gatedByTag) {
-  //     return false;
-  //   }
-
-  //   if (!hasGroupGating && this.currentUser) {
-  //     return false;
-  //   }
-
-  //   return true;
-  // }
-
   get shouldShow() {
     const isLoggedIn = !!this.currentUser;
     const isAllowedUser = this.userAllowedByGroup;
